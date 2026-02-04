@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cartita 💌</title>
+<style>
+  *{box-sizing:border-box;font-family:Arial, sans-serif}
+  body{
+    margin:0;height:100vh;overflow:hidden;
+    display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(180deg,#ffd1dc,#ffb6c1);
+    transition:background .5s ease;
+  }
+
+  /* corazones flotando */
+  .heart{
+    position:absolute; top:110vh;
+    font-size:18px; opacity:.55;
+    animation:float 6s linear infinite;
+    pointer-events:none;
+  }
+  @keyframes float{
+    from{ transform:translateY(0) }
+    to{ transform:translateY(-130vh) }
+  }
+
+  /* caja */
+  .card{
+    width:min(360px, 92vw);
+    background:rgba(255,255,255,.72);
+    border-radius:22px;
+    padding:22px 18px;
+    text-align:center;
+    z-index:2;
+    box-shadow:0 12px 30px rgba(0,0,0,.15);
+  }
+  h2{ margin:6px 0 14px; font-weight:700; }
+
+  /* sobre */
+  .envelope{
+    width:min(260px, 78vw);
+    height:160px;
+    margin:10px auto 14px;
+    background:#f5c400;
+    border-radius:14px;
+    position:relative;
+    overflow:hidden;
+    box-shadow:0 10px 20px rgba(0,0,0,.12) inset;
+  }
+  .envelope:before{
+    content:"";
+    position:absolute; left:0; right:0; bottom:0;
+    height:70px;
+    background:rgba(0,0,0,.06);
+    clip-path:polygon(0 0, 50% 90%, 100% 0, 100% 100%, 0 100%);
+  }
+
+  /* carta */
+  .letter{
+    position:absolute;
+    left:12px; right:12px;
+    bottom:-110%;
+    height:140px;
+    background:#fff;
+    border-radius:12px;
+    padding:12px 12px 10px;
+    box-shadow:0 10px 18px rgba(0,0,0,.18);
+    transition:bottom .65s ease;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    gap:8px;
+  }
+  .envelope.open .letter{ bottom:10px; }
+
+  .msg{
+    font-size:16px;
+    font-weight:700;
+    line-height:1.2;
+  }
+
+  /* ✅ ÚNICO CAMBIO: foto más grande y completa */
+  .photo{
+    width:100%;
+    height:120px;          /* antes: 82px */
+    border-radius:10px;
+    overflow:hidden;
+    background:#eee;
+  }
+  .photo img{
+    width:100%; height:100%;
+    object-fit:contain;    /* antes: cover */
+    display:block;
+  }
+
+  /* botones */
+  .buttons{
+    display:flex; gap:14px;
+    justify-content:center;
+    margin-top:8px;
+  }
+  button{
+    border:none;
+    border-radius:999px;
+    padding:10px 22px;
+    font-size:16px;
+    cursor:pointer;
+    box-shadow:0 8px 18px rgba(0,0,0,.12);
+    transition:transform .08s ease;
+  }
+  button:active{ transform:scale(.98); }
+  .yes{ background:#ff5c8a; color:#fff; }
+  .no{ background:#d7d7d7; color:#333; }
+
+  /* modos fondo */
+  body.mode-yes{
+    background:#b30019; /* rojo */
+  }
+  body.mode-no{
+    background:#0c0c0c; /* negro */
+  }
+</style>
+</head>
+
+<body>
+  <div class="card">
+    <h2>¿Querés ser mi San Valentín? 💕</h2>
+
+    <div class="envelope" id="env">
+      <div class="letter" id="letter">
+        <div class="msg" id="msg"> </div>
+        <div class="photo">
+          <img id="img" src="" alt="foto" />
+        </div>
+      </div>
+    </div>
+
+    <div class="buttons">
+      <button class="yes" onclick="chooseYes()">Sí 💖</button>
+      <button class="no" onclick="chooseNo()">No 🖤</button>
+    </div>
+  </div>
+
+<script>
+  // ====== CONFIG (tus fotos) ======
+  const PHOTO_YES = "si.jpeg"; // subí tu foto con este nombre
+  const PHOTO_NO  = "no.jpeg"; // subí tu foto con este nombre
+
+  // corazones flotando por modo
+  let heartTimer = null;
+
+  function startHearts(mode){
+    // limpia anteriores
+    if (heartTimer) clearInterval(heartTimer);
+
+    heartTimer = setInterval(() => {
+      const h = document.createElement("div");
+      h.className = "heart";
+      h.innerHTML = "❤";
+
+      // posición y velocidad
+      h.style.left = Math.random() * 100 + "vw";
+      h.style.animationDuration = (3 + Math.random() * 4) + "s";
+      h.style.fontSize = (14 + Math.random() * 14) + "px";
+
+      // colores según modo
+      if (mode === "yes"){
+        const colors = ["#ff8fb1", "#ffb6c1", "#111111"]; // rosados + negro
+        h.style.color = colors[Math.floor(Math.random() * colors.length)];
+        h.style.opacity = 0.65;
+      } else if (mode === "no"){
+        h.style.color = "#ff1e3c"; // rojo
+        h.style.opacity = 0.7;
+      } else {
+        h.style.color = "#ffffff";
+      }
+
+      document.body.appendChild(h);
+      setTimeout(() => h.remove(), 8000);
+    }, 260);
+  }
+
+  // corazones suaves al inicio
+  startHearts("yes"); // podés cambiar a "yes" o "no" si querés
+  document.body.classList.remove("mode-yes","mode-no");
+  // (si no querés nada al inicio, comentá startHearts de arriba)
+
+  function openLetter(text, imgSrc){
+    document.getElementById("msg").textContent = text;
+    document.getElementById("img").src = imgSrc;
+    document.getElementById("env").classList.add("open");
+  }
+
+  function chooseYes(){
+    document.body.classList.remove("mode-no");
+    document.body.classList.add("mode-yes");
+    startHearts("yes");
+
+    openLetter("Bueno, vení y haceme toda tuya esta que me duela todo💋", PHOTO_YES);
+  }
+
+  function chooseNo(){
+    document.body.classList.remove("mode-yes");
+    document.body.classList.add("mode-no");
+    startHearts("no");
+
+    openLetter("Bueno, está bien igual veni a darme en 4", PHOTO_NO);
+  }
+</script>
+</body>
+</html>
+
